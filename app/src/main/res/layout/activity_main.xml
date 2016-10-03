@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+        android:background="@android:color/background_dark">
+
+
+    <app.com.sensr.SpeedometerGauge
+    android:layout_width="fill_parent"
+    android:layout_height="250dp"
+    android:padding="8dp"
+    android:id="@+id/speedometer"/>
+
+    <app.com.sensr.rpmGauge
+        android:layout_width="fill_parent"
+        android:layout_height="250dp"
+        android:padding="8dp"
+        android:id="@+id/rpm"
+        android:layout_below="@+id/speedometer" />
+
+    <app.com.sensr.CoolantTempGauge
+        android:layout_width="fill_parent"
+        android:layout_height="250dp"
+        android:padding="8dp"
+        android:id="@+id/coolanttemp"
+        android:layout_below="@+id/rpm" />
+
+    <app.com.sensr.BatteryIndicatorGauge
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/coolanttemp"
+        android:padding="8dp"
+        android:id="@+id/batteryindicator"
+        android:visibility="gone" />
+
+    <app.com.sensr.CircularProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/batteryindicator"
+        android:padding="8dp"
+        android:id="@+id/circularprogress"
+        android:visibility="gone" />
+</RelativeLayout>
