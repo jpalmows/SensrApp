@@ -30,21 +30,24 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
     private app.com.sensr.SpeedometerGauge speedometer;
     private app.com.sensr.BatteryIndicatorGauge batteryindicator;
     private app.com.sensr.CoolantTempGauge coolanttemp;
+    private app.com.sensr.OilPressureGauge oilpressure;
+
     private app.com.sensr.rpmGauge rpm;
 
-    private Float floatval;
+    private Float floatvalCoolantTemp, floatvalOilPressure;
     private Double tempDouble;
-    private String outputTemp;
+    private String outputTemp, outputPressure;
     String hex = "";
     char[] arr;
 
-    TextView coolantTempText;
+    TextView coolantTempText, oilPressureText;
 
     private BluetoothAdapter mBluetoothAdapter;
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
   Handler handler1 = new Handler();
     Handler handler2 = new Handler();
+    Handler handler3 = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,21 +74,21 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
 
 
         //rpm code..
-        rpm = (rpmGauge) findViewById(R.id.rpm);
-        rpm.setMaxSpeed(50);
-        rpm.setLabelConverter(new app.com.sensr.rpmGauge.LabelConverter() {
-            @Override
-            public String getLabelFor(double progress, double maxProgress) {
-                return String.valueOf((int) Math.round(progress));
-            }
-        });
-        rpm.setMaxSpeed(7001);
-        rpm.setMajorTickStep(1000);
-        rpm.setMinorTicks(4);
-        rpm.addColoredRange(0, 30, Color.GREEN);
-        rpm.addColoredRange(30, 45, Color.YELLOW);
-        rpm.addColoredRange(45, 50, Color.RED);
-        rpm.setSpeed(15, 1000, 300);
+//        rpm = (rpmGauge) findViewById(R.id.rpm);
+//        rpm.setMaxSpeed(50);
+//        rpm.setLabelConverter(new app.com.sensr.rpmGauge.LabelConverter() {
+//            @Override
+//            public String getLabelFor(double progress, double maxProgress) {
+//                return String.valueOf((int) Math.round(progress));
+//            }
+//        });
+//        rpm.setMaxSpeed(7001);
+//        rpm.setMajorTickStep(1000);
+//        rpm.setMinorTicks(4);
+//        rpm.addColoredRange(0, 30, Color.GREEN);
+//        rpm.addColoredRange(30, 45, Color.YELLOW);
+//        rpm.addColoredRange(45, 50, Color.RED);
+//        rpm.setSpeed(15, 1000, 300);
 
 
 
@@ -115,6 +118,33 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
                 return true;
             }
         });
+
+        //oil pressure code..
+        oilpressure = (OilPressureGauge) findViewById(R.id.oilpressure);
+        oilpressure.setMaxSpeed(50);
+        oilpressure.setLabelConverter(new app.com.sensr.OilPressureGauge.LabelConverter() {
+            @Override
+            public String getLabelFor(double progress, double maxProgress) {
+                return String.valueOf((int) Math.round(progress));
+            }
+        });
+        oilpressure.setMaxSpeed(100);
+        oilpressure.setMajorTickStep(25);
+        oilpressure.setMinorTicks(4);
+        oilpressure.addColoredRange(0, 100, Color.GREEN);
+        oilpressure.addColoredRange(100, 200, Color.YELLOW);
+        oilpressure.addColoredRange(200, 300, Color.RED);
+
+        oilPressureText =  (TextView) findViewById(R.id.oilpressuretext2);
+
+//        coolanttemp.setOnLongClickListener(new View.OnLongClickListener(){
+//            @Override
+//            public boolean onLongClick(View v) {
+//
+//
+//                return true;
+//            }
+//        });
 
 //
 //
@@ -158,13 +188,15 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         hex = bytesToHex(scanRecord);
         arr = hex.toCharArray();
 
+        System.out.println(device.getAddress()+ " "+ hex);
+
         //0 to 1 output
         String output = hex.substring(10, 18);
 
         //   handler1.postDelayed(systemPrint,0);
 
 
-        if (device.getAddress().toString().equals("D0:31:CB:30:78:C2")){
+        if (device.getAddress().toString().equals("E8:3D:0C:81:71:F4")){
 
            // System.out.println(HexToString(message) );
            // System.out.println(hex);
@@ -173,14 +205,49 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
             String reversedOutput = output.substring(6,8)+output.substring(4,6)+ output.substring(2,4)+output.substring(0,2);
            // System.out.println("REVERSED:  "+reversedOutput);
             Long i = Long.parseLong(reversedOutput,16);
-            floatval = (Float.intBitsToFloat(i.intValue()));
-            System.out.println("float: "+floatval);
-            outputTemp = outputToTemp(floatval).toString();
+            floatvalCoolantTemp = (Float.intBitsToFloat(i.intValue()));
+            System.out.println("float: "+floatvalCoolantTemp);
+            outputTemp = outputToTemp(floatvalCoolantTemp).toString();
             System.out.println("resistance: "+outputTemp);
 
-            handler2.postDelayed(tempOutput,50);
+            handler2.postDelayed(tempOutput,100);
 
         }
+
+        if (device.getAddress().toString().equals("D0:31:CB:30:78:C2")){
+
+            // System.out.println(HexToString(message) );
+            // System.out.println(hex);
+            //  System.out.println(hex);
+            //  System.out.println(output);
+            String reversedOutput = output.substring(6,8)+output.substring(4,6)+ output.substring(2,4)+output.substring(0,2);
+            // System.out.println("REVERSED:  "+reversedOutput);
+            Long i = Long.parseLong(reversedOutput,16);
+            floatvalOilPressure = (Float.intBitsToFloat(i.intValue()));
+            System.out.println("float: "+floatvalOilPressure);
+            outputPressure = outputToPressure(floatvalOilPressure).toString();
+            System.out.println("resistance: "+outputPressure);
+
+            handler3.postDelayed(pressureOutput,100);
+
+        }
+//        if (device.getAddress().toString().equals("E8:3D:0C:81:71:F4")){
+//
+//            // System.out.println(HexToString(message) );
+//            // System.out.println(hex);
+//            //  System.out.println(hex);
+//            //  System.out.println(output);
+//            String reversedOutput = output.substring(6,8)+output.substring(4,6)+ output.substring(2,4)+output.substring(0,2);
+//            // System.out.println("REVERSED:  "+reversedOutput);
+//            Long i = Long.parseLong(reversedOutput,16);
+//            floatval = (Float.intBitsToFloat(i.intValue()));
+//            System.out.println("float: "+floatval);
+//            outputTemp = outputToTemp(floatval).toString();
+//            System.out.println("resistance: "+outputTemp);
+//
+//            handler2.postDelayed(tempOutput,50);
+//
+//        }
     }
 
 
@@ -249,13 +316,23 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         public void run() {
 
             coolantTempText.setText(outputTemp+" °F");
-            coolanttemp.setSpeed(outputToTemp(floatval), 10, 300);
+            coolanttemp.setSpeed(outputToTemp(floatvalCoolantTemp), 10, 100);
 
-            handler2.removeCallbacks(this, 50);
+            handler2.removeCallbacks(this, 0);
 
         }
     };
+    public Runnable pressureOutput = new Runnable() {
+        //
+        public void run() {
 
+            oilPressureText.setText(outputPressure+" PSI");
+            oilpressure.setSpeed(outputToPressure(floatvalOilPressure), 10, 100);
+
+            handler3.removeCallbacks(this, 0);
+
+        }
+    };
     private static int hexToInt(char ch) {
         if ('a' <= ch && ch <= 'f') { return ch - 'a' + 10; }
         if ('A' <= ch && ch <= 'F') { return ch - 'A' + 10; }
@@ -292,38 +369,48 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         String output = Integer.toHexString(Float.floatToIntBits(f));
         return output;
     }
-    private static Long outputToTemp(Float FloatVal)
-    {
-        double roomTemp = 298.15;
-        double roomTempRes = 5000;
-        double Bcoeff = 3900;
-        Double Vdrop = 3.3 - (3.3* FloatVal);
-
-        Double i = 3.3*FloatVal/roomTempRes;
-        Double ThermRes = Vdrop/i;
-        Double ThermTempKel = 1/((1/roomTemp) + ((1/Bcoeff)*Math.log(ThermRes/roomTempRes)));
-        Double ThermTempCel = ThermTempKel -273.15;
-        Long ThermTempF = Math.round(ThermTempCel * 1.8 +32);
-
-       // String ThermStr = ThermTempF.toString();
-
-        return ThermTempF;
-    }
 //    private static Long outputToTemp(Float FloatVal)
 //    {
 //        double roomTemp = 298.15;
-//        double roomTempRes = 1000;
+//        double roomTempRes = 5000;
 //        double Bcoeff = 3900;
 //        Double Vdrop = 3.3 - (3.3* FloatVal);
-
+//
 //        Double i = 3.3*FloatVal/roomTempRes;
 //        Double ThermRes = Vdrop/i;
 //        Double ThermTempKel = 1/((1/roomTemp) + ((1/Bcoeff)*Math.log(ThermRes/roomTempRes)));
 //        Double ThermTempCel = ThermTempKel -273.15;
-     //   Long ThermTempF = Math.round(-75.52*Math.log(FloatVal)+6.5178);
+//        Long ThermTempF = Math.round(ThermTempCel * 1.8 +32);
+//
+//       // String ThermStr = ThermTempF.toString();
+//
+//        return ThermTempF;
+//    }
+    private static Long outputToPressure(Float FloatVal)
+    {
+
+
+        Long OilPressure = Math.abs(Math.round(-255.68*FloatVal + 137.42));
 
         // String ThermStr = ThermTempF.toString();
 
-       // return ThermTempF;
-   // }
+        return OilPressure;
+    }
+    private static Long outputToTemp(Float FloatVal)
+    {
+//        double roomTemp = 298.15;
+//        double roomTempRes = 1000;
+//        double Bcoeff = 3900;
+//        Double Vdrop = 3.3 - (3.3* FloatVal);
+//
+//        Double i = 3.3*FloatVal/roomTempRes;
+//        Double ThermRes = Vdrop/i;
+//        Double ThermTempKel = 1/((1/roomTemp) + ((1/Bcoeff)*Math.log(ThermRes/roomTempRes)));
+//        Double ThermTempCel = ThermTempKel -273.15;
+        Long ThermTempF = Math.round(-75.52*Math.log(FloatVal)+6.5178);
+
+         String ThermStr = ThermTempF.toString();
+
+        return ThermTempF;
+    }
 }
