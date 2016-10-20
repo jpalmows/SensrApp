@@ -1,28 +1,90 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-        android:background="@android:color/background_dark">
+        android:background="#eee6e6">
 
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:id="@+id/topbar"
+        android:background="#000000"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SENS"
+            android:id="@+id/textView"
+            android:textSize="30dp"
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="R"
+            android:id="@+id/textView2"
+            android:textSize="30dp"
+            android:textColor="#e2e2e2"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/topbar"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Coolant Temperature"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_horizontal"
+            android:textStyle="bold" />
+
+        <app.com.sensr.CoolantTempGauge
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:id="@+id/coolanttemp"
+            android:clickable="true"
+            android:layout_marginTop="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/coolantTempText"
+            android:layout_below="@+id/coolanttemp"
+            android:layout_centerHorizontal="true"
+            android:textSize="55dp"
+            android:textColor="#000000"
+            android:text="-°F"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
 
     <app.com.sensr.SpeedometerGauge
     android:layout_width="fill_parent"
     android:layout_height="250dp"
     android:padding="8dp"
-    android:id="@+id/speedometer"/>
+    android:id="@+id/speedometer"
+        android:visibility="gone" />
 
     <app.com.sensr.rpmGauge
         android:layout_width="fill_parent"
         android:layout_height="250dp"
         android:padding="8dp"
         android:id="@+id/rpm"
-        android:layout_below="@+id/speedometer" />
-
-    <app.com.sensr.CoolantTempGauge
-        android:layout_width="fill_parent"
-        android:layout_height="250dp"
-        android:padding="8dp"
-        android:id="@+id/coolanttemp"
-        android:layout_below="@+id/rpm" />
+        android:layout_below="@+id/speedometer"
+        android:visibility="gone" />
 
     <app.com.sensr.BatteryIndicatorGauge
         android:layout_width="wrap_content"
@@ -39,4 +101,19 @@
         android:padding="8dp"
         android:id="@+id/circularprogress"
         android:visibility="gone" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/bottombar"
+        android:background="#000000"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:gravity="center">
+
+    </LinearLayout>
+
 </RelativeLayout>

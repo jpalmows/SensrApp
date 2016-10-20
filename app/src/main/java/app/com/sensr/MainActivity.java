@@ -32,14 +32,19 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
     private app.com.sensr.CoolantTempGauge coolanttemp;
     private app.com.sensr.rpmGauge rpm;
 
-
+    private Float floatval;
+    private Double tempDouble;
+    private String outputTemp;
     String hex = "";
     char[] arr;
+
+    TextView coolantTempText;
 
     private BluetoothAdapter mBluetoothAdapter;
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-  Handler handler1 = new android.os.Handler();
+  Handler handler1 = new Handler();
+    Handler handler2 = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +63,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         });
         speedometer.setMaxSpeed(100);
         speedometer.setMajorTickStep(10);
-        speedometer.setMinorTicks(9);
+        speedometer.setMinorTicks(1);
        // speedometer.addColoredRange(0, 30, Color.GREEN);
        // speedometer.addColoredRange(30, 45, Color.YELLOW);
        // speedometer.addColoredRange(45, 50, Color.RED);
-        speedometer.setSpeed(15, 1000, 300);
+        speedometer.setSpeed(0, 1000, 300);
 
 
         //rpm code..
@@ -96,11 +101,20 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         coolanttemp.setMaxSpeed(250);
         coolanttemp.setMajorTickStep(50);
         coolanttemp.setMinorTicks(4);
-        coolanttemp.addColoredRange(0, 30, Color.GREEN);
-        coolanttemp.addColoredRange(30, 45, Color.YELLOW);
-        coolanttemp.addColoredRange(45, 50, Color.RED);
-        coolanttemp.setSpeed(15, 1000, 300);
+        coolanttemp.addColoredRange(0, 100, Color.GREEN);
+        coolanttemp.addColoredRange(100, 200, Color.YELLOW);
+        coolanttemp.addColoredRange(200, 300, Color.RED);
 
+         coolantTempText =  (TextView) findViewById(R.id.coolantTempText);
+
+        coolanttemp.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v) {
+
+
+                return true;
+            }
+        });
 
 //
 //
@@ -143,14 +157,29 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
 //
         hex = bytesToHex(scanRecord);
         arr = hex.toCharArray();
-        String message = hex.substring(10, 15);
+
+        //0 to 1 output
+        String output = hex.substring(10, 18);
 
         //   handler1.postDelayed(systemPrint,0);
 
 
         if (device.getAddress().toString().equals("D0:31:CB:30:78:C2")){
 
-            System.out.println(HexToString(message) );
+           // System.out.println(HexToString(message) );
+           // System.out.println(hex);
+          //  System.out.println(hex);
+          //  System.out.println(output);
+            String reversedOutput = output.substring(6,8)+output.substring(4,6)+ output.substring(2,4)+output.substring(0,2);
+           // System.out.println("REVERSED:  "+reversedOutput);
+            Long i = Long.parseLong(reversedOutput,16);
+            floatval = (Float.intBitsToFloat(i.intValue()));
+            System.out.println("float: "+floatval);
+            outputTemp = outputToTemp(floatval).toString();
+            System.out.println("resistance: "+outputTemp);
+
+            handler2.postDelayed(tempOutput,50);
+
         }
     }
 
@@ -215,7 +244,17 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         }
     };
 
+    public Runnable tempOutput = new Runnable() {
+        //
+        public void run() {
 
+            coolantTempText.setText(outputTemp+" °F");
+            coolanttemp.setSpeed(outputToTemp(floatval), 10, 300);
+
+            handler2.removeCallbacks(this, 50);
+
+        }
+    };
 
     private static int hexToInt(char ch) {
         if ('a' <= ch && ch <= 'f') { return ch - 'a' + 10; }
@@ -246,4 +285,45 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         return sb.toString();
     }
 
+    private static String HexToFloat(String hexValue)
+    {
+        Long i = Long.parseLong(hexValue, 16);
+        Float f = Float.intBitsToFloat(i.intValue());
+        String output = Integer.toHexString(Float.floatToIntBits(f));
+        return output;
+    }
+    private static Long outputToTemp(Float FloatVal)
+    {
+        double roomTemp = 298.15;
+        double roomTempRes = 5000;
+        double Bcoeff = 3900;
+        Double Vdrop = 3.3 - (3.3* FloatVal);
+
+        Double i = 3.3*FloatVal/roomTempRes;
+        Double ThermRes = Vdrop/i;
+        Double ThermTempKel = 1/((1/roomTemp) + ((1/Bcoeff)*Math.log(ThermRes/roomTempRes)));
+        Double ThermTempCel = ThermTempKel -273.15;
+        Long ThermTempF = Math.round(ThermTempCel * 1.8 +32);
+
+       // String ThermStr = ThermTempF.toString();
+
+        return ThermTempF;
+    }
+//    private static Long outputToTemp(Float FloatVal)
+//    {
+//        double roomTemp = 298.15;
+//        double roomTempRes = 1000;
+//        double Bcoeff = 3900;
+//        Double Vdrop = 3.3 - (3.3* FloatVal);
+
+//        Double i = 3.3*FloatVal/roomTempRes;
+//        Double ThermRes = Vdrop/i;
+//        Double ThermTempKel = 1/((1/roomTemp) + ((1/Bcoeff)*Math.log(ThermRes/roomTempRes)));
+//        Double ThermTempCel = ThermTempKel -273.15;
+     //   Long ThermTempF = Math.round(-75.52*Math.log(FloatVal)+6.5178);
+
+        // String ThermStr = ThermTempF.toString();
+
+       // return ThermTempF;
+   // }
 }
