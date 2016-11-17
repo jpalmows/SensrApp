@@ -35,7 +35,7 @@ public class SpeedometerGauge extends View {
     public static final double DEFAULT_MAX_SPEED = 100.0;
     public static final double DEFAULT_MAJOR_TICK_STEP = 20.0;
     public static final int DEFAULT_MINOR_TICKS = 1;
-    public static final int DEFAULT_LABEL_TEXT_SIZE_DP = 12;
+    public static final int DEFAULT_LABEL_TEXT_SIZE_DP = 15;
     public static final int DEFAULT_UNITS_TEXT_SIZE_DP = 15;
 
     private double maxSpeed = DEFAULT_MAX_SPEED;
@@ -310,7 +310,7 @@ public class SpeedometerGauge extends View {
         float minorTicksLength = majorTicksLength/2;
 
         RectF oval = getOval(canvas, 1);
-        float radius = oval.width()*0.35f;
+        float radius = oval.width()*0.38f;
 
         float currentAngle = 10;
         double curProgress = 0;
@@ -384,7 +384,7 @@ public class SpeedometerGauge extends View {
         canvas.drawArc(oval, 180, 180, true, backgroundPaint);
 
         RectF innerOval = getOval(canvas, 0.9f);
-        canvas.drawArc(innerOval, 180, 180, true, backgroundInnerPaint);
+        canvas.drawArc(innerOval, 0, 0, true, backgroundInnerPaint);
 
         Bitmap mask = Bitmap.createScaledBitmap(mMask, (int) (oval.width() * 1.1), (int) (oval.height() * 1.1) / 2, true);
         canvas.drawBitmap(mask, oval.centerX() - oval.width()*1.1f/2, oval.centerY()-oval.width()*1.1f/2, maskPaint);

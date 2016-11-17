@@ -306,7 +306,7 @@ public class OilPressureGauge extends View {
         float minorTicksLength = majorTicksLength/2;
 
         RectF oval = getOval(canvas, 1);
-        float radius = oval.width()*0.35f;
+        float radius = oval.width()*0.31f;
 
         float currentAngle = 10;
         double curProgress = 0;
@@ -380,7 +380,7 @@ public class OilPressureGauge extends View {
         canvas.drawArc(oval, 180, 180, true, backgroundPaint);
 
         RectF innerOval = getOval(canvas, 0.9f);
-        canvas.drawArc(innerOval, 180, 180, true, backgroundInnerPaint);
+        canvas.drawArc(innerOval, 0, 180, true, backgroundInnerPaint);
 
         Bitmap mask = Bitmap.createScaledBitmap(mMask, (int) (oval.width() * 1.1), (int) (oval.height() * 1.1) / 2, true);
         canvas.drawBitmap(mask, oval.centerX() - oval.width()*1.1f/2, oval.centerY()-oval.width()*1.1f/2, maskPaint);

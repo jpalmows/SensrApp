@@ -1,20 +1,27 @@
 package app.com.sensr;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -25,7 +32,7 @@ import java.util.Collections;
 import dashr.app.com.sensr.R;
 
 
-public class MainActivity extends AppCompatActivity implements BluetoothAdapter.LeScanCallback{
+public class MainActivity extends AppCompatActivity implements BluetoothAdapter.LeScanCallback , LocationListener {
 
     private app.com.sensr.SpeedometerGauge speedometer;
     private app.com.sensr.BatteryIndicatorGauge batteryindicator;
@@ -37,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
     private Float floatvalCoolantTemp, floatvalOilPressure;
     private Double tempDouble;
     private String outputTemp, outputPressure;
+    private Long commdelay1 = 0L;
+    private Long commdelay2 = 0L;
+    public static String ARG_SECTION_NUMBER;
     String hex = "";
     char[] arr;
 
@@ -45,14 +55,36 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
     private BluetoothAdapter mBluetoothAdapter;
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-  Handler handler1 = new Handler();
+    Handler handler1 = new Handler();
     Handler handler2 = new Handler();
     Handler handler3 = new Handler();
+
+    ImageButton ChartView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        handler1.postDelayed(checkStatus, 0);
+
+        ChartView = (ImageButton) findViewById(R.id.chartView);
+
+
+
+        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+     //   this.onLocationChanged(null);
 
 
         //speedometer code..
@@ -131,9 +163,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         oilpressure.setMaxSpeed(100);
         oilpressure.setMajorTickStep(25);
         oilpressure.setMinorTicks(4);
-        oilpressure.addColoredRange(0, 100, Color.GREEN);
-        oilpressure.addColoredRange(100, 200, Color.YELLOW);
-        oilpressure.addColoredRange(200, 300, Color.RED);
+        oilpressure.addColoredRange(75, 100, Color.GREEN);
+        oilpressure.addColoredRange(25, 75, Color.YELLOW);
+        oilpressure.addColoredRange(0, 25, Color.RED);
 
         oilPressureText =  (TextView) findViewById(R.id.oilpressuretext2);
 
@@ -156,6 +188,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         BluetoothManager manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         mBluetoothAdapter = manager.getAdapter();
         mBluetoothAdapter.startLeScan(this);
+
+
+
     }
 
 
@@ -188,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         hex = bytesToHex(scanRecord);
         arr = hex.toCharArray();
 
-        System.out.println(device.getAddress()+ " "+ hex);
+      //  System.out.println(device.getAddress()+ " "+ hex);
 
         //0 to 1 output
         String output = hex.substring(10, 18);
@@ -198,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
 
         if (device.getAddress().toString().equals("E8:3D:0C:81:71:F4")){
 
+            commdelay1 = SystemClock.uptimeMillis();
+
            // System.out.println(HexToString(message) );
            // System.out.println(hex);
           //  System.out.println(hex);
@@ -206,15 +243,17 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
            // System.out.println("REVERSED:  "+reversedOutput);
             Long i = Long.parseLong(reversedOutput,16);
             floatvalCoolantTemp = (Float.intBitsToFloat(i.intValue()));
-            System.out.println("float: "+floatvalCoolantTemp);
+           // System.out.println("float: "+floatvalCoolantTemp);
             outputTemp = outputToTemp(floatvalCoolantTemp).toString();
-            System.out.println("resistance: "+outputTemp);
+         //   System.out.println("resistance: "+outputTemp);
 
             handler2.postDelayed(tempOutput,100);
 
         }
 
         if (device.getAddress().toString().equals("D0:31:CB:30:78:C2")){
+
+            commdelay2 = SystemClock.uptimeMillis();
 
             // System.out.println(HexToString(message) );
             // System.out.println(hex);
@@ -224,9 +263,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
             // System.out.println("REVERSED:  "+reversedOutput);
             Long i = Long.parseLong(reversedOutput,16);
             floatvalOilPressure = (Float.intBitsToFloat(i.intValue()));
-            System.out.println("float: "+floatvalOilPressure);
+           // System.out.println("float: "+floatvalOilPressure);
             outputPressure = outputToPressure(floatvalOilPressure).toString();
-            System.out.println("resistance: "+outputPressure);
+         //   System.out.println("resistance: "+outputPressure);
 
             handler3.postDelayed(pressureOutput,100);
 
@@ -255,6 +294,22 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
     protected void onResume() {
         super.onResume();
 
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            //Bluetooth is disabled
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivity(enableBtIntent);
+            finish();
+            return;
+        }
+
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, "No LE Support.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+
+        mBluetoothAdapter.startLeScan(this);
 
 //        // Ensures Bluetooth is available on the device and it is enabled. If not,
 //        // displays a dialog requesting user permission to enable Bluetooth.
@@ -301,12 +356,21 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         return val;
     }
 
-    public Runnable systemPrint = new Runnable() {
+    public Runnable checkStatus = new Runnable() {
         //
         public void run() {
-            System.out.println("hex");
 
-            handler1.removeCallbacks(this, 0);
+            if ((SystemClock.uptimeMillis() - commdelay1) > 3000 ){
+                coolantTempText.setText(" - °F");
+                coolanttemp.setSpeed(0, 10, 100);
+
+            }
+            if ((SystemClock.uptimeMillis() - commdelay2) > 3000 ){
+                oilPressureText.setText(" - P.S.I.");
+                oilpressure.setSpeed(0, 10, 100);
+
+            }
+            handler1.postDelayed(this, 250);
 
         }
     };
@@ -325,9 +389,17 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
     public Runnable pressureOutput = new Runnable() {
         //
         public void run() {
+            Long pressureVal = outputToPressure(floatvalOilPressure);
 
-            oilPressureText.setText(outputPressure+" PSI");
-            oilpressure.setSpeed(outputToPressure(floatvalOilPressure), 10, 100);
+            if (Integer.parseInt(outputPressure) < 5){
+                outputPressure = "0";
+                 pressureVal = 0L;
+             //   System.out.println(Integer.parseInt("string to int: "+outputPressure));
+            }
+
+            oilPressureText.setText(outputPressure+" P.S.I.");
+
+            oilpressure.setSpeed(pressureVal, 10, 100);
 
             handler3.removeCallbacks(this, 0);
 
@@ -412,5 +484,53 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
          String ThermStr = ThermTempF.toString();
 
         return ThermTempF;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        TextView speedText = (TextView) this.findViewById(R.id.speedText);
+        System.out.println("working");
+        if (location == null){
+            speedText.setText("- MPH");
+
+
+        }
+        else {
+            float mCurrentSpeed = location.getSpeed();
+            float mCurrentSpeedmph = mCurrentSpeed * 2.23694f;
+            speedText.setText(String.format("%.2f", mCurrentSpeedmph) + " MPH");
+            speedometer.setSpeed(mCurrentSpeedmph, 10, 100);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    public void ChartView(View view) {
+        Intent ChartView = new Intent(MainActivity.this, ChartView.class);
+        startActivity(ChartView);
+    }
+
+    public void onSectionAttached(int number) {
+        switch (number) {
+            case 1:
+                // Your code
+                break;
+            case 2:
+                // your code
+                break;
+        }
     }
 }

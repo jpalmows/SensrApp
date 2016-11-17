@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-        android:background="#eee6e6">
+        android:background="#eee6e6"
+    android:weightSum="1">
 
 
     <LinearLayout
@@ -36,102 +37,155 @@
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/topbar"
-        android:layout_marginTop="10dp"
-        android:gravity="center_horizontal"
+        android:weightSum="2"
+        android:id="@+id/gauge1Layout"
+        android:layout_alignParentLeft="false"
         android:layout_centerHorizontal="true"
-        android:id="@+id/coolanttemplayout">
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Coolant Temperature"
-            android:id="@+id/textView3"
-            android:layout_gravity="center_horizontal"
-            android:textStyle="bold"
-            android:textSize="15dp" />
-
-        <app.com.sensr.CoolantTempGauge
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:id="@+id/coolanttemp"
-            android:clickable="true"
-            android:layout_marginTop="8dp"
-            android:layout_gravity="center_horizontal" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/coolantTempText"
-            android:layout_below="@+id/coolanttemp"
+            android:layout_below="@+id/topbar"
+            android:gravity="center_horizontal"
             android:layout_centerHorizontal="true"
-            android:textSize="30dp"
-            android:textColor="#000000"
-            android:text="-°F"
-            android:layout_gravity="center_horizontal" />
+            android:id="@+id/coolanttemplayout"
+            android:layout_weight=".95"
+            >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Coolant Temperature"
+                android:id="@+id/textView3"
+                android:layout_gravity="center_horizontal"
+                android:textStyle="bold"
+                android:textSize="13dp"
+                android:maxLines="1"
+                android:gravity="center" />
+
+            <app.com.sensr.CoolantTempGauge
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:id="@+id/coolanttemp"
+                android:clickable="true"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/coolantTempText"
+                android:layout_below="@+id/coolanttemp"
+                android:layout_centerHorizontal="true"
+                android:textSize="30dp"
+                android:textColor="#000000"
+                android:text="-°F"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/coolanttemplayout"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/oilpressurelayout"
+            android:visibility="visible"
+            android:layout_weight=".95"
+            android:layout_marginLeft="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Oil Pressure"
+                android:id="@+id/oilpressuretext"
+                android:layout_gravity="center_horizontal"
+                android:textStyle="bold"
+                android:textSize="13dp" />
+
+            <app.com.sensr.OilPressureGauge
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:id="@+id/oilpressure"
+                android:clickable="true"
+                android:layout_marginTop="8dp" />
+
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/oilpressuretext2"
+                android:layout_below="@+id/coolanttemp"
+                android:layout_centerHorizontal="true"
+                android:textSize="30dp"
+                android:textColor="#000000"
+                android:text="- P.S.I."
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/coolanttemplayout"
-        android:layout_marginTop="10dp"
-        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/oilpressurelayout">
+        android:id="@+id/gauge2Layout"
+        android:layout_below="@+id/gauge1Layout"
+        android:layout_marginTop="20dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Oil Pressure"
-            android:id="@+id/oilpressuretext"
-            android:layout_gravity="center_horizontal"
-            android:textStyle="bold"
-            android:textSize="15dp" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="1dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Speed"
+                android:id="@+id/speedGaugeTest"
+                android:layout_gravity="center_horizontal"
+                android:textStyle="bold"
+                android:textSize="15dp"
+                />
 
-        <app.com.sensr.OilPressureGauge
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:id="@+id/oilpressure"
-            android:clickable="true"
-            android:layout_marginTop="8dp"
-            android:layout_gravity="center_horizontal"
-             />
+            <app.com.sensr.SpeedometerGauge
+                android:layout_width="wrap_content"
+                android:layout_height="280dp"
+                android:padding="8dp"
+                android:id="@+id/speedometer"
+                android:visibility="visible"
+                android:layout_gravity="center_horizontal" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/speedText"
+                android:layout_below="@+id/coolanttemp"
+                android:layout_centerHorizontal="true"
+                android:textSize="30dp"
+                android:textColor="#000000"
+                android:text="- MPH"
+                android:layout_gravity="center_horizontal" />
 
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/oilpressuretext2"
-            android:layout_below="@+id/coolanttemp"
-            android:layout_centerHorizontal="true"
-            android:textSize="30dp"
-            android:textColor="#000000"
-            android:text="-PSI"
-            android:layout_gravity="center_horizontal" />
+        </LinearLayout>
     </LinearLayout>
-
-    <app.com.sensr.SpeedometerGauge
-    android:layout_width="fill_parent"
-    android:layout_height="250dp"
-    android:padding="8dp"
-    android:id="@+id/speedometer"
-        android:visibility="gone" />
-
 
 
     <app.com.sensr.BatteryIndicatorGauge
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/coolanttemp"
         android:padding="8dp"
         android:id="@+id/batteryindicator"
         android:visibility="gone" />
@@ -156,6 +210,16 @@
         android:paddingBottom="5dp"
         android:gravity="center">
 
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/chartView"
+            android:src="@mipmap/charticon"
+            android:background="#00ffffff"
+            android:tint="@color/abc_primary_text_disable_only_material_dark"
+            android:scaleType="fitXY"
+            android:onClick="ChartView"
+            />
     </LinearLayout>
 
 </RelativeLayout>
