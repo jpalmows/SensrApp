@@ -15,25 +15,33 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Collections;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
-import dashr.app.com.sensr.R;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
 
 
 public class MainActivity extends AppCompatActivity implements BluetoothAdapter.LeScanCallback , LocationListener {
 
+    Database db;
     private app.com.sensr.SpeedometerGauge speedometer;
     private app.com.sensr.BatteryIndicatorGauge batteryindicator;
     private app.com.sensr.CoolantTempGauge coolanttemp;
@@ -59,18 +67,66 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
     Handler handler2 = new Handler();
     Handler handler3 = new Handler();
 
-    ImageButton ChartView;
+    ImageButton ChartView,GaugeView,DataView;
+
+    private LineGraphSeries<DataPoint> series;
+    Handler handler4 = new Handler();
+    GraphView graph;
+    int[] intArray = new int[10];
+    Random r = new Random();
+    LinearLayout gauge1layout, gauge2layout, dataLayout,ChartViewLayout,GaugeViewLayout,DataViewLayout;
+    float mCurrentSpeedmph;
+    int mCurrentSpeedmphInt;
+
+    ArrayAdapter<String> dataAdapter1, dataAdapter2,dataAdapter3;
+    ListView dataList1, dataList2, dataList3;
+    List<String> listData1,listData2,listData3;
+
+    private String currentSpeed;
+
+    public static ArrayList<String> SensorTypeList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+         db = new Database(this);
+
 
         handler1.postDelayed(checkStatus, 0);
 
         ChartView = (ImageButton) findViewById(R.id.chartView);
+        GaugeView = (ImageButton) findViewById(R.id.gaugeView);
+        DataView = (ImageButton) findViewById(R.id.dataView);
 
+        ChartViewLayout = (LinearLayout) findViewById(R.id.chartviewLayout);
+        GaugeViewLayout = (LinearLayout) findViewById(R.id.gaugeviewLayout);
+        DataViewLayout = (LinearLayout) findViewById(R.id.dataviewLayout);
 
+        gauge1layout = (LinearLayout) findViewById(R.id.gauge1Layout);
+        gauge2layout = (LinearLayout) findViewById(R.id.gauge2Layout);
+
+        dataLayout = (LinearLayout) findViewById(R.id.dataLayout);
+        dataList1 = (ListView) findViewById(R.id.dataList1);
+        dataList2 = (ListView) findViewById(R.id.dataList2);
+        dataList3 = (ListView) findViewById(R.id.dataList3);
+
+        listData1 = new ArrayList<String>();
+        listData2 = new ArrayList<String>();
+        listData3 = new ArrayList<String>();
+
+       // listData1.addAll(db.getSensorTypeList());
+        listData1.addAll(db.getAllData());
+        listData2.addAll(db.getDataList());
+        listData3.addAll(db.getTimeStampList());
+
+        dataAdapter1  = new ArrayAdapter<String>(this,R.layout.listviewcustomlayout1,listData1);
+        dataAdapter2  = new ArrayAdapter<String>(this,R.layout.listviewcustomlayout1,listData2);
+        dataAdapter3  = new ArrayAdapter<String>(this,R.layout.listviewcustomlayout1,listData3);
+
+        dataList1.setAdapter(dataAdapter1);
+        dataList2.setAdapter(dataAdapter2);
+        dataList3.setAdapter(dataAdapter3);
 
         LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -189,6 +245,41 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         mBluetoothAdapter = manager.getAdapter();
         mBluetoothAdapter.startLeScan(this);
 
+        intArray[0]=1;
+        intArray[1]=2;
+        intArray[2]=3;
+        intArray[3]=4;
+        intArray[4]=5;
+        intArray[5]=6;
+        intArray[6]=7;
+        intArray[7]=8;
+        intArray[8]=9;
+        intArray[9]=10;
+
+
+        graph = (GraphView) findViewById(R.id.graph);
+        Viewport viewport = graph.getViewport();
+        viewport.setXAxisBoundsManual(true);
+        viewport.setMinX(0);
+        viewport.setMaxX(intArray.length);
+        viewport.setScrollable(true);
+
+        handler1.postDelayed(randNums,100);
+
+        DataView.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+
+
+                    Intent dbmanager = new Intent(MainActivity.this, DatabaseManager.class);
+                    startActivity(dbmanager);
+
+                return true;
+
+            }
+
+        });
 
 
     }
@@ -381,7 +472,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
 
             coolantTempText.setText(outputTemp+" °F");
             coolanttemp.setSpeed(outputToTemp(floatvalCoolantTemp), 10, 100);
+            SimpleDateFormat s = new SimpleDateFormat("MM/dd/yyyy  hh:mm:ss");
+            String timestamp = s.format(new Date());
 
+
+            db.insertData("Coolant Temperature",outputTemp,timestamp);
             handler2.removeCallbacks(this, 0);
 
         }
@@ -400,6 +495,12 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
             oilPressureText.setText(outputPressure+" P.S.I.");
 
             oilpressure.setSpeed(pressureVal, 10, 100);
+
+            SimpleDateFormat s = new SimpleDateFormat("MM/dd/yyyy  hh:mm:ss");
+            String timestamp = s.format(new Date());
+
+
+            db.insertData("Oil Pressure",outputPressure,timestamp);
 
             handler3.removeCallbacks(this, 0);
 
@@ -466,6 +567,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
 
         // String ThermStr = ThermTempF.toString();
 
+
         return OilPressure;
     }
     private static Long outputToTemp(Float FloatVal)
@@ -481,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
 //        Double ThermTempCel = ThermTempKel -273.15;
         Long ThermTempF = Math.round(-75.52*Math.log(FloatVal)+6.5178);
 
-         String ThermStr = ThermTempF.toString();
+
 
         return ThermTempF;
     }
@@ -497,9 +599,16 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
         }
         else {
             float mCurrentSpeed = location.getSpeed();
-            float mCurrentSpeedmph = mCurrentSpeed * 2.23694f;
-            speedText.setText(String.format("%.2f", mCurrentSpeedmph) + " MPH");
+            mCurrentSpeedmph = mCurrentSpeed * 2.23694f;
+            mCurrentSpeedmphInt = Math.round(mCurrentSpeedmph);
+            currentSpeed = String.format("%.2f", mCurrentSpeedmph);
+            speedText.setText(currentSpeed + " MPH");
             speedometer.setSpeed(mCurrentSpeedmph, 10, 100);
+            SimpleDateFormat s = new SimpleDateFormat("MM/dd/yyyy  hh:mm:ss");
+            String timestamp = s.format(new Date());
+
+
+            db.insertData("Speed",currentSpeed,timestamp);
         }
     }
 
@@ -519,10 +628,46 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
     }
 
     public void ChartView(View view) {
-        Intent ChartView = new Intent(MainActivity.this, ChartView.class);
-        startActivity(ChartView);
-    }
+       // Intent ChartView = new Intent(MainActivity.this, ChartView.class);
+      //  startActivity(ChartView);
+      gauge1layout.setVisibility(View.GONE);
+      gauge2layout.setVisibility(View.GONE);
+        graph.setVisibility(View.VISIBLE);
+     ChartViewLayout.setVisibility(View.GONE);
+      GaugeViewLayout.setVisibility(View.VISIBLE);
+        DataViewLayout.setVisibility(View.VISIBLE);
+        dataLayout.setVisibility(View.GONE);
 
+    }
+    public void GaugeView(View view) {
+        // Intent ChartView = new Intent(MainActivity.this, ChartView.class);
+        //  startActivity(ChartView);
+        gauge1layout.setVisibility(View.VISIBLE);
+        gauge2layout.setVisibility(View.VISIBLE);
+        graph.setVisibility(View.GONE);
+
+        ChartViewLayout.setVisibility(View.VISIBLE);
+        GaugeViewLayout.setVisibility(View.GONE);
+        DataViewLayout.setVisibility(View.VISIBLE);
+        dataLayout.setVisibility(View.GONE);
+
+
+
+    }
+    public void DataView(View view) {
+        // Intent ChartView = new Intent(MainActivity.this, ChartView.class);
+        //  startActivity(ChartView);
+        gauge1layout.setVisibility(View.GONE);
+        gauge2layout.setVisibility(View.GONE);
+        graph.setVisibility(View.GONE);
+
+        ChartViewLayout.setVisibility(View.VISIBLE);
+        GaugeViewLayout.setVisibility(View.VISIBLE);
+        DataViewLayout.setVisibility(View.GONE);
+        dataLayout.setVisibility(View.VISIBLE);
+
+
+    }
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
@@ -533,4 +678,47 @@ public class MainActivity extends AppCompatActivity implements BluetoothAdapter.
                 break;
         }
     }
+
+   private int i = 8;
+    public Runnable randNums = new Runnable() {
+        //
+        public void run() {
+
+            int randNum = r.nextInt(80 - 0) + 0;
+
+
+
+                intArray[i] = intArray[i+1];
+
+            intArray[9]=mCurrentSpeedmphInt;
+            graph.removeAllSeries();
+
+            series = new LineGraphSeries<>(new DataPoint[] {
+
+
+                    new DataPoint(0, intArray[0]),
+                    new DataPoint(1, intArray[1]),
+                    new DataPoint(2, intArray[2]),
+                    new DataPoint(3, intArray[3]),
+                    new DataPoint(4, intArray[4]),
+                    new DataPoint(5, intArray[5]),
+                    new DataPoint(6, intArray[6]),
+                    new DataPoint(7, intArray[7]),
+                    new DataPoint(8, intArray[8]),
+                    new DataPoint(9, intArray[9])
+
+                    //  new DataPoint(50, 90)
+
+            });
+            graph.addSeries(series);
+            i=i-1;
+            if (i==0){
+                i=8;
+            }
+
+            handler1.postDelayed(this,100);
+
+        }
+    };
+
 }

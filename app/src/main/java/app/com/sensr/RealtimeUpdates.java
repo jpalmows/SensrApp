@@ -16,7 +16,6 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.Random;
 
-import dashr.app.com.sensr.R;
 
 public class RealtimeUpdates extends Fragment {
 

@@ -35,6 +35,49 @@
             android:textColor="#e2e2e2"
             android:textStyle="bold" />
     </LinearLayout>
+    <LinearLayout
+
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:weightSum="3"
+        android:visibility="gone"
+        android:id="@+id/dataLayout"
+        android:layout_below="@+id/topbar">
+
+        <ListView
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:id="@+id/dataList1"
+            android:layout_below="@+id/view"
+            android:layout_centerInParent="true"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:foregroundGravity="center"
+            android:layout_weight="3"/>
+        <ListView
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:id="@+id/dataList2"
+            android:layout_below="@+id/view"
+            android:layout_centerInParent="true"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:foregroundGravity="center"
+            android:layout_weight="0"/>
+        <ListView
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:id="@+id/dataList3"
+            android:layout_below="@+id/view"
+            android:layout_centerInParent="true"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:foregroundGravity="center"
+            android:layout_weight="0"/>
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -134,6 +177,13 @@
         </LinearLayout>
     </LinearLayout>
 
+    <com.jjoe64.graphview.GraphView
+        android:layout_width="match_parent"
+        android:layout_height="200dip"
+        android:id="@+id/graph"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -208,18 +258,89 @@
         android:background="#000000"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:weightSum="2">
 
-        <ImageButton
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:id="@+id/chartView"
-            android:src="@mipmap/charticon"
-            android:background="#00ffffff"
-            android:tint="@color/abc_primary_text_disable_only_material_dark"
-            android:scaleType="fitXY"
-            android:onClick="ChartView"
-            />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/chartviewLayout"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/chartView"
+                android:src="@mipmap/charticon"
+                android:background="#00ffffff"
+                android:tint="@color/abc_primary_text_disable_only_material_dark"
+                android:scaleType="fitXY"
+                android:onClick="ChartView"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/gaugeviewLayout"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/gaugeView"
+                android:src="@mipmap/gauge3"
+                android:background="#00ffffff"
+                android:tint="@color/abc_primary_text_disable_only_material_dark"
+                android:scaleType="fitXY"
+                android:onClick="GaugeView"
+                android:visibility="visible"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/dataviewLayout"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/dataView"
+                android:src="@mipmap/dataview_icon"
+                android:background="#00ffffff"
+                android:tint="@color/abc_primary_text_disable_only_material_dark"            android:scaleType="fitXY"
+                android:onClick="DataView"
+                android:visibility="visible"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/locationviewLayout"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/locationView"
+                android:src="@mipmap/dataview_icon"
+                android:background="#00ffffff"
+                android:tint="@color/abc_primary_text_disable_only_material_dark"            android:scaleType="fitXY"
+                android:onClick="DataView"
+                android:visibility="visible"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

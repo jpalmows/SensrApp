@@ -5,7 +5,7 @@ android {
     buildToolsVersion '21.1.1'
 
     defaultConfig {
-        applicationId "dashr.app.com.app.com.sensr"
+        applicationId "app.com.sensr"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1

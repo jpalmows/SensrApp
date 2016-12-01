@@ -14,7 +14,6 @@ import android.util.AttributeSet;
 import android.view.View;
 
 
-import dashr.app.com.sensr.R;
 
 /**
  * Created by danon on 03.04.2014.

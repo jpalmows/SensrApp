@@ -16,7 +16,6 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import dashr.app.com.sensr.R;
 
 /**
  * Speedometer with needle.
